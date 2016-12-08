@@ -1,4 +1,4 @@
-﻿  DIrectXTemplatePCH.cpp
-  main.cpp
+﻿  compilation header save succeeded; see C:\Users\parcw\Desktop\Renderer\Renderer\Renderer\VertexShader.h
+  compilation object save succeeded; see C:\Users\parcw\Desktop\Renderer\Renderer\Renderer\bin\SimpleVertexShader.cso
   Renderer.vcxproj -> C:\Users\parcw\Desktop\Renderer\Renderer\Renderer\bin\Rendererd.exe
   Renderer.vcxproj -> bin\Rendererd.pdb (Partial PDB)

@@ -363,6 +363,112 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine,
 	return returnCode;
 }
 
+bool LoadContent()
+{
+	assert(g_d3dDevice);
+
+	//Create an initialize the vertex buffer
+	D3D11_BUFFER_DESC vertexBufferDesc;
+	ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.ByteWidth = sizeof(VertexPosColor)*_countof(g_Vertices);
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+
+	D3D11_SUBRESOURCE_DATA resourceData;
+	ZeroMemory(&resourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+
+	resourceData.pSysMem = g_Vertices;
+
+	HRESULT hr = g_d3dDevice->CreateBuffer(&vertexBufferDesc, &resourceData, &g_d3dVertexBuffer);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	// Create and initialize the index buffer
+	D3D11_BUFFER_DESC indexBufferDesc;
+	ZeroMemory(&indexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+
+	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.ByteWidth = sizeof(WORD)*_countof(g_Indicies);
+	indexBufferDesc.CPUAccessFlags = 0;
+	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	resourceData.pSysMem = g_Indicies;
+
+	hr = g_d3dDevice->CreateBuffer(&indexBufferDesc, &resourceData, &g_d3dIndexBuffer);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	// Create constant buffers for the variable defined in the vertex shader
+	D3D11_BUFFER_DESC constantBufferDesc;
+	ZeroMemory(&constantBufferDesc, sizeof(D3D11_BUFFER_DESC));
+
+	constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	constantBufferDesc.ByteWidth = sizeof(XMMATRIX);
+	constantBufferDesc.CPUAccessFlags = 0;
+	constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+
+	hr = g_d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &g_d3dConstantBuffers[CB_Application]);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+	hr = g_d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &g_d3dConstantBuffers[CB_Frame]);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+	hr = g_d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &g_d3dConstantBuffers[CB_Object]);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	//laod the compiled vertex shader
+	ID3DBlob* vertexShaderBlob;
+#if _DEBUG
+	LPCWSTR compiledVertexShaderObject = L"SimpleVertexShader_d.cso";
+#else
+	LPCWSTR compiledVertexShaderObject = L"SimpleVertexShader.cso";
+#endif
+
+	hr = D3DReadFileToBlob(compiledVertexShaderObject, &vertexShaderBlob);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	hr = g_d3dDevice->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), nullptr, &g_d3dVertexShader);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	//laod the compiled pixel shader
+	ID3DBlob* pixelShaderBlob;
+#if _DEBUG
+	LPCWSTR compiledPixelShaderObject = L"SimplePixelShader_d.cso";
+#else
+	LPCWSTR compiledPixelShaderObject = L"SimplePixelShader.cso";
+#endif
+
+	hr = D3DReadFileToBlob(compiledPixelShaderObject, &pixelShaderBlob);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	hr = g_d3dDevice->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &g_d3dPixelShader);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+}
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT paintStruct;
@@ -387,3 +493,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	return 0;
 }
+
+
+//TODO:  use this template to replace the sizeof stuf used in the demo  
+//template<typename T, std::size_t N = sizeof(T)>void ZeroMemory2(T* const t){ ::ZeroMemory(t, N);} 

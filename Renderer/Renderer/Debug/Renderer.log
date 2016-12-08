@@ -1,4 +1,4 @@
-﻿  compilation header save succeeded; see C:\Users\parcw\Desktop\Renderer\Renderer\Renderer\VertexShader.h
-  compilation object save succeeded; see C:\Users\parcw\Desktop\Renderer\Renderer\Renderer\bin\SimpleVertexShader.cso
+﻿  main.cpp
+c:\users\parcw\desktop\renderer\renderer\renderer\main.cpp(450): warning C4715: 'LoadContent': not all control paths return a value
   Renderer.vcxproj -> C:\Users\parcw\Desktop\Renderer\Renderer\Renderer\bin\Rendererd.exe
   Renderer.vcxproj -> bin\Rendererd.pdb (Partial PDB)

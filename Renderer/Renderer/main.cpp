@@ -55,7 +55,7 @@ XMMATRIX g_ProjectionMatrix;
 // Vertex data for a colored cube.
 struct VertexPosColor
 {
-	XMFLOAT3 Postion;
+	XMFLOAT3 Position;
 	XMFLOAT3 Color;
 };
 
@@ -325,8 +325,8 @@ int Run()
 			// debugging and you don't want the deltaTime value to explode.
 			deltaTime = std::min<float>(deltaTime, maxTimeStep);
 
-			//Update(deltaTime);
-			//Render();
+			Update(deltaTime);
+			Render();
 		}
 	}
 
@@ -358,7 +358,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine,
 		return -1;
 	}
 
+	if (!LoadContent())
+	{
+		MessageBox(nullptr, TEXT("Failed to load content."), TEXT("ERROR"), MB_OK);
+		return -1;
+	}
+
 	int returnCode = Run();
+
+	UnloadContent();
+	Cleanup();
 
 	return returnCode;
 }
@@ -448,7 +457,22 @@ bool LoadContent()
 		return false;
 	}
 
-	//laod the compiled pixel shader
+	//Create the input laout for the vertex shader.	
+	D3D11_INPUT_ELEMENT_DESC vertexLayoutDesc[]=
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, offsetof(VertexPosColor,Position),D3D11_INPUT_PER_VERTEX_DATA,0},
+		{"COLOR", 0 , DXGI_FORMAT_R32G32_SINT, 0, offsetof(VertexPosColor, Color), D3D11_INPUT_PER_VERTEX_DATA,0}
+	};
+
+	hr = g_d3dDevice->CreateInputLayout(vertexLayoutDesc, _countof(vertexLayoutDesc), vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &g_d3dInputLayout);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	SafeRelease(vertexShaderBlob);
+
+	//Load the compiled pixel shader
 	ID3DBlob* pixelShaderBlob;
 #if _DEBUG
 	LPCWSTR compiledPixelShaderObject = L"SimplePixelShader_d.cso";
@@ -467,6 +491,23 @@ bool LoadContent()
 	{
 		return false;
 	}
+
+	SafeRelease(pixelShaderBlob);
+
+	//Setup the projectionmatrix.
+	RECT clientRect;
+	GetClientRect(g_WindowHandle, &clientRect);
+
+	//compute the exact client dimesnsions.
+	//the is required for a correct projection matrix.
+	float clientWidth = static_cast<float>(clientRect.right - clientRect.left);
+	float clientHeight = static_cast<float>(clientRect.bottom - clientRect.top);
+
+	g_ProjectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), clientWidth / clientHeight, 0.1f, 100.0f);
+
+	g_d3dDeviceContext->UpdateSubresource(g_d3dConstantBuffers[CB_Application], 0, nullptr, &g_ProjectionMatrix, 0, 0);
+	
+	return true;
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -492,6 +533,97 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 
 	return 0;
+}
+
+void Update(float deltaTime)
+{
+	XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
+	XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
+	XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
+	g_ViewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
+	g_d3dDeviceContext->UpdateSubresource(g_d3dConstantBuffers[CB_Frame], 0, nullptr, &g_ViewMatrix, 0, 0);
+
+
+	static float angle = 0.0f;
+	angle += 90.0f*deltaTime;
+	XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
+
+	g_WorldMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));
+	g_d3dDeviceContext->UpdateSubresource(g_d3dConstantBuffers[CB_Object], 0, nullptr, &g_WorldMatrix, 0, 0);
+}
+
+//Clear the color and depth buffers.
+void Clear(const FLOAT clearColor[4], FLOAT clearDepth, UINT8 clearStencil)
+{
+	g_d3dDeviceContext->ClearRenderTargetView(g_d3dRenderTargetView, clearColor);
+	g_d3dDeviceContext->ClearDepthStencilView(g_d3dDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, clearDepth, clearStencil);
+}
+
+void Present(bool vSync)
+{
+	if (vSync)
+	{
+		g_d3dSwapChain->Present(1, 0);
+	}
+	else
+	{
+		g_d3dSwapChain->Present(0, 0);
+	}
+}
+
+void Render()
+{
+	assert(g_d3dDevice);
+	assert(g_d3dDeviceContext);
+
+	Clear(Colors::CornflowerBlue, 1.0f, 0);
+
+	const UINT vertexStride = sizeof(VertexPosColor);
+	const UINT offset = 0;
+
+	g_d3dDeviceContext->IASetVertexBuffers(0, 1, &g_d3dVertexBuffer, &vertexStride, &offset);
+	g_d3dDeviceContext->IASetInputLayout(g_d3dInputLayout);
+	g_d3dDeviceContext->IASetIndexBuffer(g_d3dIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+	g_d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	g_d3dDeviceContext->VSSetShader(g_d3dVertexShader, nullptr, 0);
+	g_d3dDeviceContext->VSSetConstantBuffers(0, 3, g_d3dConstantBuffers);
+
+	g_d3dDeviceContext->RSSetState(g_d3dRasterizerState);
+	g_d3dDeviceContext->RSSetViewports(1, &g_Viewport);
+
+	g_d3dDeviceContext->PSSetShader(g_d3dPixelShader, nullptr, 0);
+
+	g_d3dDeviceContext->OMSetRenderTargets(1, &g_d3dRenderTargetView, g_d3dDepthStencilView);
+	g_d3dDeviceContext->OMSetDepthStencilState(g_d3dDepthStencilState, 1);
+
+	g_d3dDeviceContext->DrawIndexed(_countof(g_Indicies), 0, 0);
+
+	Present(g_EnableVSync);
+}
+
+void UnloadContent()
+{
+	SafeRelease(g_d3dConstantBuffers[CB_Application]);
+	SafeRelease(g_d3dConstantBuffers[CB_Frame]);
+	SafeRelease(g_d3dConstantBuffers[CB_Object]);
+	SafeRelease(g_d3dIndexBuffer);
+	SafeRelease(g_d3dVertexBuffer);
+	SafeRelease(g_d3dInputLayout);
+	SafeRelease(g_d3dVertexShader);
+	SafeRelease(g_d3dPixelShader);
+}
+
+void Cleanup()
+{
+	SafeRelease(g_d3dDepthStencilView);
+	SafeRelease(g_d3dRenderTargetView);
+	SafeRelease(g_d3dDepthStencilBuffer);
+	SafeRelease(g_d3dDepthStencilState);
+	SafeRelease(g_d3dRasterizerState);
+	SafeRelease(g_d3dSwapChain);
+	SafeRelease(g_d3dDeviceContext);
+	SafeRelease(g_d3dDevice);
 }
 
 

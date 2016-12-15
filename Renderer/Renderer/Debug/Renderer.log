@@ -1,2 +1,3 @@
 ﻿  main.cpp
-LINK : fatal error LNK1168: cannot open bin\Rendererd.exe for writing
+  Renderer.vcxproj -> C:\Users\parcw\Desktop\Renderer\Renderer\Renderer\bin\Rendererd.exe
+  Renderer.vcxproj -> bin\Rendererd.pdb (Partial PDB)

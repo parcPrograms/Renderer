@@ -1,5 +1,7 @@
 #include "DirectXTemplatePCH.h"
 using namespace DirectX;
+#include <iostream>
+using namespace std;
 
 const LONG g_WindowWidth = 1280;
 const LONG g_WindowHeight = 720;
@@ -78,7 +80,7 @@ WORD g_Indicies[36] =
 	4, 5, 1, 4, 1, 0,
 	3, 2, 6, 3, 6, 7,
 	1, 5, 6, 1, 6, 2,
-	4, 0, 3, 4, 2, 7
+	4, 0, 3, 4, 3, 7
 };
 
 
@@ -360,6 +362,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine,
 
 	if (!LoadContent())
 	{
+		MessageBox(nullptr, TEXT("failed on load conet"), TEXT("ERROR"), MB_OK);
 		MessageBox(nullptr, TEXT("Failed to load content."), TEXT("ERROR"), MB_OK);
 		return -1;
 	}
@@ -393,6 +396,8 @@ bool LoadContent()
 	HRESULT hr = g_d3dDevice->CreateBuffer(&vertexBufferDesc, &resourceData, &g_d3dVertexBuffer);
 	if (FAILED(hr))
 	{
+	//	return false;
+		MessageBox(nullptr, TEXT("vertex buffer"), TEXT("ERROR"), MB_OK);
 		return false;
 	}
 
@@ -409,6 +414,8 @@ bool LoadContent()
 	hr = g_d3dDevice->CreateBuffer(&indexBufferDesc, &resourceData, &g_d3dIndexBuffer);
 	if (FAILED(hr))
 	{
+	//	return false;
+		MessageBox(nullptr, TEXT("inex buffer"), TEXT("ERROR"), MB_OK);
 		return false;
 	}
 
@@ -424,49 +431,62 @@ bool LoadContent()
 	hr = g_d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &g_d3dConstantBuffers[CB_Application]);
 	if (FAILED(hr))
 	{
+	//	return false;
+		MessageBox(nullptr, TEXT("CB_Application"), TEXT("ERROR"), MB_OK);
 		return false;
 	}
 	hr = g_d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &g_d3dConstantBuffers[CB_Frame]);
 	if (FAILED(hr))
 	{
+	//	return false;
+		MessageBox(nullptr, TEXT("CB_Frame"), TEXT("ERROR"), MB_OK);
 		return false;
 	}
 	hr = g_d3dDevice->CreateBuffer(&constantBufferDesc, nullptr, &g_d3dConstantBuffers[CB_Object]);
 	if (FAILED(hr))
 	{
+	//	return false;
+		MessageBox(nullptr, TEXT("CB_Object"), TEXT("ERROR"), MB_OK);
 		return false;
 	}
 
 	//laod the compiled vertex shader
 	ID3DBlob* vertexShaderBlob;
 #if _DEBUG
-	LPCWSTR compiledVertexShaderObject = L"SimpleVertexShader_d.cso";
+	LPCWSTR compiledVertexShaderObject = L"SimpleVertexShader.cso";
 #else
 	LPCWSTR compiledVertexShaderObject = L"SimpleVertexShader.cso";
 #endif
-
+	
 	hr = D3DReadFileToBlob(compiledVertexShaderObject, &vertexShaderBlob);
 	if (FAILED(hr))
 	{
+	//	return false;
+		MessageBox(nullptr, TEXT("D3DReadFileToBlob vertex"), TEXT("ERROR"), MB_OK);
 		return false;
 	}
 
 	hr = g_d3dDevice->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), nullptr, &g_d3dVertexShader);
 	if (FAILED(hr))
 	{
+	//	return false;
+		MessageBox(nullptr, TEXT("CreateVertexShader"), TEXT("ERROR"), MB_OK);
 		return false;
 	}
 
 	//Create the input laout for the vertex shader.	
 	D3D11_INPUT_ELEMENT_DESC vertexLayoutDesc[]=
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, offsetof(VertexPosColor,Position),D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"COLOR", 0 , DXGI_FORMAT_R32G32_SINT, 0, offsetof(VertexPosColor, Color), D3D11_INPUT_PER_VERTEX_DATA,0}
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosColor,Position),D3D11_INPUT_PER_VERTEX_DATA,0},
+		{"COLOR", 0 , DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosColor, Color), D3D11_INPUT_PER_VERTEX_DATA,0}
 	};
 
 	hr = g_d3dDevice->CreateInputLayout(vertexLayoutDesc, _countof(vertexLayoutDesc), vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &g_d3dInputLayout);
 	if (FAILED(hr))
 	{
+	//	return false;
+		cout << "dfsgsd" << endl;
+		MessageBox(nullptr, TEXT("CreateInputLayout :P"), TEXT("ERROR"), MB_OK);
 		return false;
 	}
 
@@ -475,7 +495,7 @@ bool LoadContent()
 	//Load the compiled pixel shader
 	ID3DBlob* pixelShaderBlob;
 #if _DEBUG
-	LPCWSTR compiledPixelShaderObject = L"SimplePixelShader_d.cso";
+	LPCWSTR compiledPixelShaderObject = L"SimplePixelShader.cso";
 #else
 	LPCWSTR compiledPixelShaderObject = L"SimplePixelShader.cso";
 #endif
@@ -483,22 +503,26 @@ bool LoadContent()
 	hr = D3DReadFileToBlob(compiledPixelShaderObject, &pixelShaderBlob);
 	if (FAILED(hr))
 	{
+	//	return false;
+		MessageBox(nullptr, TEXT("D3DReadFileToBlob pixel"), TEXT("ERROR"), MB_OK);
 		return false;
 	}
 
 	hr = g_d3dDevice->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &g_d3dPixelShader);
 	if (FAILED(hr))
 	{
+		//return false;
+		MessageBox(nullptr, TEXT("CreatePixelShader"), TEXT("ERROR"), MB_OK);
 		return false;
 	}
 
 	SafeRelease(pixelShaderBlob);
 
-	//Setup the projectionmatrix.
+	//Setup the projection matrix.
 	RECT clientRect;
 	GetClientRect(g_WindowHandle, &clientRect);
 
-	//compute the exact client dimesnsions.
+	//compute the exact client dimensions.
 	//the is required for a correct projection matrix.
 	float clientWidth = static_cast<float>(clientRect.right - clientRect.left);
 	float clientHeight = static_cast<float>(clientRect.bottom - clientRect.top);

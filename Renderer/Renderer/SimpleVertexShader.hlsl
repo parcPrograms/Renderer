@@ -8,15 +8,15 @@ cbuffer PerFrame : register(b1)
 	matrix viewMatrix;
 }
 
-cbuffer PerObject : register (b2)
+cbuffer PerObject : register(b2)
 {
 	matrix worldMatrix;
 }
 
 struct AppData
 {
-	float3 position : POSTION;
-	float3 color : COLOR;
+    float3 position : POSITION;
+    float3 color: COLOR;
 };
 
 struct VertexShaderOutput

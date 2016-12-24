@@ -29,3 +29,5 @@ inline void SafeRelease(T& ptr)
 		ptr = NULL;
 	}
 }
+
+//https://github.com/parcPrograms/Renderer

@@ -46,7 +46,7 @@ int DX11Render::InitDirectX(HINSTANCE hInstance, BOOL vSync)
 	unsigned int clientHeight = clientRect.bottom - clientRect.top;
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-	ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
+	ZeroMemory2(&swapChainDesc);
 	DXGI_RATIONAL DxgiRational; DxgiRational.Numerator = 0; DxgiRational.Denominator = 1; //hardcoding in a 0/1 here because the refresrate function isnt real
 	swapChainDesc.BufferCount = 1;
 	swapChainDesc.BufferDesc.Width = clientWidth;
@@ -120,7 +120,7 @@ int DX11Render::InitDirectX(HINSTANCE hInstance, BOOL vSync)
 
 	// Create the depth buffer for use with the depth/stencil view
 	D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
-	ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
+	ZeroMemory2(&depthStencilBufferDesc);
 
 	depthStencilBufferDesc.ArraySize = 1;
 	depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -147,7 +147,7 @@ int DX11Render::InitDirectX(HINSTANCE hInstance, BOOL vSync)
 
 	// setup depth/stencil state
 	D3D11_DEPTH_STENCIL_DESC depthStencilStateDesc;
-	ZeroMemory(&depthStencilStateDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+	ZeroMemory2(&depthStencilStateDesc);
 
 	depthStencilStateDesc.DepthEnable = TRUE;
 	depthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -158,7 +158,7 @@ int DX11Render::InitDirectX(HINSTANCE hInstance, BOOL vSync)
 
 	//setup rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
-	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+	ZeroMemory2(&rasterizerDesc);
 
 	rasterizerDesc.AntialiasedLineEnable = FALSE;
 	rasterizerDesc.CullMode = D3D11_CULL_BACK;
@@ -236,7 +236,7 @@ bool DX11Render::LoadContent()
 
 	//Create an initialize the vertex buffer
 	D3D11_BUFFER_DESC vertexBufferDesc;
-	ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+	ZeroMemory2(&vertexBufferDesc);
 
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.ByteWidth = sizeof(VertexPosColor)*_countof(Vertices);
@@ -244,7 +244,7 @@ bool DX11Render::LoadContent()
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
 	D3D11_SUBRESOURCE_DATA resourceData;
-	ZeroMemory(&resourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+	ZeroMemory2(&resourceData);
 
 	resourceData.pSysMem = Vertices;
 
@@ -258,7 +258,7 @@ bool DX11Render::LoadContent()
 
 	// Create and initialize the index buffer
 	D3D11_BUFFER_DESC indexBufferDesc;
-	ZeroMemory(&indexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+	ZeroMemory2(&indexBufferDesc);
 
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexBufferDesc.ByteWidth = sizeof(WORD)*_countof(Indicies);
@@ -276,7 +276,7 @@ bool DX11Render::LoadContent()
 
 	// Create constant buffers for the variable defined in the vertex shader
 	D3D11_BUFFER_DESC constantBufferDesc;
-	ZeroMemory(&constantBufferDesc, sizeof(D3D11_BUFFER_DESC));
+	ZeroMemory2(&constantBufferDesc);
 
 	constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	constantBufferDesc.ByteWidth = sizeof(XMMATRIX);
@@ -397,15 +397,16 @@ void DX11Render::Clear(const FLOAT clearColor[4], FLOAT clearDepth, UINT8 clearS
 
 void DX11Render::Update(float deltaTime)
 {
+	static float angle = 0.0f;
+	angle += 90.0f*deltaTime;
 	XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
-	XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
+	XMVECTOR focusPoint = XMVectorSet(0, 0, 0 , 1);
 	XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
 	ViewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
 	d3dDeviceContext->UpdateSubresource(d3dConstantBuffers[CB_Frame], 0, nullptr, &ViewMatrix, 0, 0);
 
 
-	static float angle = 0.0f;
-	angle += 90.0f*deltaTime;
+	
 	XMVECTOR rotationAxis = XMVectorSet(0, 1, 1, 0);
 
 	WorldMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(angle));

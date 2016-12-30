@@ -90,6 +90,18 @@ private:
 		{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT3(1.0f,  0.0f,  1.0f) }, //8
 	};
 
+	VertexPosColor Vertices2[8] =
+	{
+		{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f,  0.0f,  0.0f) }, //0
+		{ XMFLOAT3(1.0f,  1.0f, -1.0f), XMFLOAT3(0.0f,  1.0f,  0.0f) }, //1
+		{ XMFLOAT3(3.0f,  1.0f, -1.0f), XMFLOAT3(1.0f,  1.0f,  0.0f) }, //2
+		{ XMFLOAT3(3.0f, -1.0f, -1.0f), XMFLOAT3(1.0f,  0.0f,  0.0f) }, //4
+		{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT3(0.0f,  0.0f,  1.0f) }, //5
+		{ XMFLOAT3(1.0f,  1.0f,  1.0f), XMFLOAT3(0.0f,  1.0f,  1.0f) }, //6
+		{ XMFLOAT3(3.0f,  1.0f,  1.0f), XMFLOAT3(1.0f,  1.0f,  1.0f) }, //7
+		{ XMFLOAT3(3.0f, -1.0f,  1.0f), XMFLOAT3(1.0f,  0.0f,  1.0f) }, //8
+	};
+
 	WORD Indicies[36] =
 	{
 		0, 1, 2, 0, 2, 3,
@@ -98,6 +110,18 @@ private:
 		3, 2, 6, 3, 6, 7,
 		1, 5, 6, 1, 6, 2,
 		4, 0, 3, 4, 3, 7
+
 	};
 
+	WORD Indicies2[36] =
+	{
+		8, 9, 10, 8, 10, 11,
+		12, 14, 13, 12, 15, 14,
+		12, 13, 9, 12, 9, 8,
+		11, 10, 14, 11, 14, 15,
+		9, 13, 14, 9, 14, 10,
+		12, 8, 11, 12, 11, 15
+	};
 };
+
+template<typename T, std::size_t N = sizeof(T)>void ZeroMemory2(T* const t) { ::ZeroMemory(t, N); }

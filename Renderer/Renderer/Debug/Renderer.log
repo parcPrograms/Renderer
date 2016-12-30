@@ -1,3 +1,5 @@
-﻿  main.cpp
+﻿  DX11Render.cpp
+c:\users\parcw\desktop\renderer\renderer\renderer\dx11render.cpp(10): warning C4316: 'DX11Render': object allocated on the heap may not be aligned 16
+c:\users\parcw\desktop\renderer\renderer\renderer\dx11render.cpp(218): warning C4800: 'const BOOL': forcing value to bool 'true' or 'false' (performance warning)
   Renderer.vcxproj -> C:\Users\parcw\Desktop\Renderer\Renderer\Renderer\bin\Rendererd.exe
   Renderer.vcxproj -> bin\Rendererd.pdb (Partial PDB)

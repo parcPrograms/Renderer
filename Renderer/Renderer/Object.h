@@ -1,5 +1,4 @@
 #pragma once
-#include "DirectXTemplatePCH.h"
 #include "DX11Render.h"
 
 
@@ -8,10 +7,11 @@ class Cube
 {
 public:
 	Cube();
+	VertexPosColor* getVerticies();
+	WORD* getIndicies();
 	int getCountOfVerticies();
 	int getCountOfIndicies();
-	VertexPosColor *getVerticies();
-	WORD *getIndicies();
+
 
 private:
 

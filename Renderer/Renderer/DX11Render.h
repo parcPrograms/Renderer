@@ -1,6 +1,6 @@
 #pragma once
 #include "DirectXTemplatePCH.h"
-#include "Object.h"
+
 
 using namespace DirectX;
 
@@ -81,4 +81,6 @@ struct VertexPosColor
 	XMFLOAT3 Position;
 	XMFLOAT3 Color;
 };
+
+template<typename T, std::size_t N = sizeof(T)>void ZeroMemory2(T* const t) { ::ZeroMemory(t, N); }
 

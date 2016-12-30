@@ -1,31 +1,5 @@
-﻿  main.cpp
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(13): error C2143: syntax error: missing ';' before '*'
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(13): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(13): error C2238: unexpected token(s) preceding ';'
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(18): error C3646: 'Vertices': unknown override specifier
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(18): error C2143: syntax error: missing ',' before '['
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(18): error C2334: unexpected token(s) preceding '{'; skipping apparent function body
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(27): error C2143: syntax error: missing ')' before ';'
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(27): error C2059: syntax error: ')'
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(27): error C2238: unexpected token(s) preceding ';'
-  DX11Render.cpp
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(13): error C2143: syntax error: missing ';' before '*'
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(13): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(13): error C2238: unexpected token(s) preceding ';'
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(18): error C3646: 'Vertices': unknown override specifier
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(18): error C2143: syntax error: missing ',' before '['
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(18): error C2334: unexpected token(s) preceding '{'; skipping apparent function body
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(27): error C2143: syntax error: missing ')' before ';'
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(27): error C2059: syntax error: ')'
-c:\users\parcw\desktop\renderer\renderer\renderer\object.h(27): error C2238: unexpected token(s) preceding ';'
+﻿  DX11Render.cpp
 c:\users\parcw\desktop\renderer\renderer\renderer\dx11render.cpp(13): warning C4316: 'DX11Render': object allocated on the heap may not be aligned 16
-c:\users\parcw\desktop\renderer\renderer\renderer\dx11render.cpp(223): warning C4800: 'const BOOL': forcing value to bool 'true' or 'false' (performance warning)
-c:\users\parcw\desktop\renderer\renderer\renderer\dx11render.cpp(254): error C2039: 'getVerticies': is not a member of 'Cube'
-  c:\users\parcw\desktop\renderer\renderer\renderer\object.h(8): note: see declaration of 'Cube'
-c:\users\parcw\desktop\renderer\renderer\renderer\dx11render.cpp(272): error C3867: 'Cube::getIndicies': non-standard syntax; use '&' to create a pointer to member
-c:\users\parcw\desktop\renderer\renderer\renderer\dx11render.cpp(272): error C2440: '=': cannot convert from 'WORD *(__thiscall Cube::* )(void)' to 'const void *'
-  c:\users\parcw\desktop\renderer\renderer\renderer\dx11render.cpp(272): note: There is no context in which this conversion is possible
-  Generating Code...
-  Compiling...
-  Objects.cpp
-  Generating Code...
+c:\users\parcw\desktop\renderer\renderer\renderer\dx11render.cpp(222): warning C4800: 'const BOOL': forcing value to bool 'true' or 'false' (performance warning)
+  Renderer.vcxproj -> C:\Users\parcw\Desktop\Renderer\Renderer\Renderer\bin\Rendererd.exe
+  Renderer.vcxproj -> bin\Rendererd.pdb (Partial PDB)

@@ -1,12 +1,12 @@
 #include "DirectXTemplatePCH.h"
 #include "DX11Render.h"
 #include "Window.h"
-//#include "Object.h"
+#include "Object.h"
 
 
 DX11Render* DX11Render::instance = 0;
 
-Cube* g_Cube = new Cube();
+Cube* g_Cube;
 
 DX11Render* DX11Render::Instance() {
 	if (instance == 0) {
@@ -15,7 +15,6 @@ DX11Render* DX11Render::Instance() {
 	return instance;
 }
 
-template<typename T, std::size_t N = sizeof(T)>void ZeroMemory2(T* const t) { ::ZeroMemory(t, N); }
 
 DX11Render::DX11Render() {
 	d3dDevice = nullptr;
@@ -251,7 +250,8 @@ bool DX11Render::LoadContent()
 	D3D11_SUBRESOURCE_DATA resourceData;
 	ZeroMemory2(&resourceData);
 
-	resourceData.pSysMem = g_Cube->getVerticies;
+	VertexPosColor* b = g_Cube->getVerticies();
+	resourceData.pSysMem = &b;
 
 	HRESULT hr = d3dDevice->CreateBuffer(&vertexBufferDesc, &resourceData, &d3dVertexBuffer);
 	if (FAILED(hr))
@@ -269,7 +269,9 @@ bool DX11Render::LoadContent()
 	indexBufferDesc.ByteWidth = sizeof(WORD)*g_Cube->getCountOfIndicies();
 	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	resourceData.pSysMem = g_Cube->getIndicies;
+
+	WORD* c= g_Cube->getIndicies();
+	resourceData.pSysMem = &c;
 
 	hr = d3dDevice->CreateBuffer(&indexBufferDesc, &resourceData, &d3dIndexBuffer);
 	if (FAILED(hr))

@@ -3,7 +3,6 @@
 #include "Window.h"
 
 
-
 void Update(float deltaTime);
 void Cleanup();
 int Run();

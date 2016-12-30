@@ -1,9 +1,12 @@
 #include "DirectXTemplatePCH.h"
 #include "DX11Render.h"
 #include "Window.h"
+//#include "Object.h"
 
 
 DX11Render* DX11Render::instance = 0;
+
+Cube* g_Cube = new Cube();
 
 DX11Render* DX11Render::Instance() {
 	if (instance == 0) {
@@ -11,6 +14,8 @@ DX11Render* DX11Render::Instance() {
 	}
 	return instance;
 }
+
+template<typename T, std::size_t N = sizeof(T)>void ZeroMemory2(T* const t) { ::ZeroMemory(t, N); }
 
 DX11Render::DX11Render() {
 	d3dDevice = nullptr;
@@ -46,7 +51,7 @@ int DX11Render::InitDirectX(HINSTANCE hInstance, BOOL vSync)
 	unsigned int clientHeight = clientRect.bottom - clientRect.top;
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-	ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
+	ZeroMemory2(&swapChainDesc);
 	DXGI_RATIONAL DxgiRational; DxgiRational.Numerator = 0; DxgiRational.Denominator = 1; //hardcoding in a 0/1 here because the refresrate function isnt real
 	swapChainDesc.BufferCount = 1;
 	swapChainDesc.BufferDesc.Width = clientWidth;
@@ -120,7 +125,7 @@ int DX11Render::InitDirectX(HINSTANCE hInstance, BOOL vSync)
 
 	// Create the depth buffer for use with the depth/stencil view
 	D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
-	ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
+	ZeroMemory2(&depthStencilBufferDesc);
 
 	depthStencilBufferDesc.ArraySize = 1;
 	depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -147,7 +152,7 @@ int DX11Render::InitDirectX(HINSTANCE hInstance, BOOL vSync)
 
 	// setup depth/stencil state
 	D3D11_DEPTH_STENCIL_DESC depthStencilStateDesc;
-	ZeroMemory(&depthStencilStateDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+	ZeroMemory2(&depthStencilStateDesc);
 
 	depthStencilStateDesc.DepthEnable = TRUE;
 	depthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -158,7 +163,7 @@ int DX11Render::InitDirectX(HINSTANCE hInstance, BOOL vSync)
 
 	//setup rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
-	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+	ZeroMemory2(&rasterizerDesc);
 
 	rasterizerDesc.AntialiasedLineEnable = FALSE;
 	rasterizerDesc.CullMode = D3D11_CULL_BACK;
@@ -213,7 +218,7 @@ void DX11Render::Render()
 	d3dDeviceContext->OMSetRenderTargets(1, &d3dRenderTargetView, d3dDepthStencilView);
 	d3dDeviceContext->OMSetDepthStencilState(d3dDepthStencilState, 1);
 
-	d3dDeviceContext->DrawIndexed(_countof(Indicies), 0, 0);
+	d3dDeviceContext->DrawIndexed(g_Cube->getCountOfIndicies(), 0, 0);
 
 	Present(EnableVSync);
 }
@@ -233,20 +238,20 @@ void DX11Render::Present(bool vSync)
 bool DX11Render::LoadContent()
 {
 	assert(d3dDevice);
-
+	
 	//Create an initialize the vertex buffer
 	D3D11_BUFFER_DESC vertexBufferDesc;
-	ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+	ZeroMemory2(&vertexBufferDesc);
 
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.ByteWidth = sizeof(VertexPosColor)*_countof(Vertices);
+	vertexBufferDesc.ByteWidth = sizeof(VertexPosColor)*g_Cube->getCountOfVerticies();
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
 	D3D11_SUBRESOURCE_DATA resourceData;
-	ZeroMemory(&resourceData, sizeof(D3D11_SUBRESOURCE_DATA));
+	ZeroMemory2(&resourceData);
 
-	resourceData.pSysMem = Vertices;
+	resourceData.pSysMem = g_Cube->getVerticies;
 
 	HRESULT hr = d3dDevice->CreateBuffer(&vertexBufferDesc, &resourceData, &d3dVertexBuffer);
 	if (FAILED(hr))
@@ -258,13 +263,13 @@ bool DX11Render::LoadContent()
 
 	// Create and initialize the index buffer
 	D3D11_BUFFER_DESC indexBufferDesc;
-	ZeroMemory(&indexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+	ZeroMemory2(&indexBufferDesc);
 
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDesc.ByteWidth = sizeof(WORD)*_countof(Indicies);
+	indexBufferDesc.ByteWidth = sizeof(WORD)*g_Cube->getCountOfIndicies();
 	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	resourceData.pSysMem = Indicies;
+	resourceData.pSysMem = g_Cube->getIndicies;
 
 	hr = d3dDevice->CreateBuffer(&indexBufferDesc, &resourceData, &d3dIndexBuffer);
 	if (FAILED(hr))
@@ -276,7 +281,7 @@ bool DX11Render::LoadContent()
 
 	// Create constant buffers for the variable defined in the vertex shader
 	D3D11_BUFFER_DESC constantBufferDesc;
-	ZeroMemory(&constantBufferDesc, sizeof(D3D11_BUFFER_DESC));
+	ZeroMemory2(&constantBufferDesc);
 
 	constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	constantBufferDesc.ByteWidth = sizeof(XMMATRIX);

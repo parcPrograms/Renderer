@@ -14,10 +14,7 @@ private:
 	Window();
 	static Window* instance;
 
-
 	// Forward declarations.
-	
-
 
 	const LONG windowWidth = 1280;
 	const LONG windowHeight = 720;
